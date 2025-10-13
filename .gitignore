@@ -1,0 +1,41 @@
+# Compiled dependencies (too large for git)
+ELINA/
+gurobi912/
+gurobi903/
+deepg/
+nets/
+
+# VSCode settings
+.vscode/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Data files
+data/*.csv
+data/MNIST/
+*.pkl
+*.npy
+
+# Gurobi files
+*.log
+*.lp
+*.mps
+gurobi.log
+
+# Test outputs
+*.out
+testing/results/
+
+# OS files
+.DS_Store
+Thumbs.db
+*~
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
