@@ -36,6 +36,7 @@ testing/results/
 .DS_Store
 Thumbs.db
 *~
+*.sh
 
 # Jupyter notebooks checkpoints
 .ipynb_checkpoints/
