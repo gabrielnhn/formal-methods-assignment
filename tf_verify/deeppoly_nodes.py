@@ -38,6 +38,9 @@ def calc_bounds(man, element, nn, nlb, nub, relu_groups, is_refine_layer = False
     itv = [bounds[i] for i in range(num_neurons)]
     lbi = [x.contents.inf.contents.val.dbl for x in itv]
     ubi = [x.contents.sup.contents.val.dbl for x in itv]
+    if hasattr(nn, 'is_softmax') and nn.is_softmax:
+        lbi = [max(0.0, x) for x in lbi]
+        ubi = [min(1.0, max(0.0, x)) for x in ubi]
     if is_refine_layer:
         nlb.append(lbi)
         nub.append(ubi)
@@ -756,3 +759,227 @@ class DeeppolyMulNode:
         if testing:
             return element, nlb[-1], nub[-1]
         return element
+
+class DeeppolySoftmaxNode(DeeppolyNonlinearity):
+    # def transformer(self, nn, man, element, nlb, nub, relu_groups, refine, timeout_lp, timeout_milp, use_default_heuristic, testing, K=3, s=-2, use_milp=False, approx=True):
+    #     """
+    #     transforms element with handle_softmax_layer
+    #     """
+    #     length = self.output_length
+        
+    #     # Check if this is a concrete evaluation
+    #     pred_layerno = self.predecessors[0] - 1
+        
+    #     is_concrete = True
+    #     concrete_tol = 1e-9  # Tighter tolerance
+    #     for i in range(len(nlb[pred_layerno])):
+    #         if abs(nub[pred_layerno][i] - nlb[pred_layerno][i]) > concrete_tol:
+    #             is_concrete = False
+    #             break
+        
+    #     if is_concrete:
+    #         # Concrete evaluation: compute exact softmax
+    #         input_vals = np.array([(nlb[pred_layerno][i] + nub[pred_layerno][i]) / 2.0 
+    #                             for i in range(len(nlb[pred_layerno]))])
+            
+    #         # Numerically stable softmax
+    #         max_val = np.max(input_vals)
+    #         exp_vals = np.exp(input_vals - max_val)
+    #         softmax_vals = exp_vals / np.sum(exp_vals)
+            
+    #         # Clamp to [0, 1]
+    #         softmax_vals = np.clip(softmax_vals, 0.0, 1.0)
+            
+    #         # Store concrete values directly
+    #         nlb.append(softmax_vals.tolist())
+    #         nub.append(softmax_vals.tolist())
+            
+    #     else:
+    #         # Abstract evaluation: use normal abstract transformer
+    #         if refine:
+    #             refine_activation_with_solver_bounds(nn, self, man, element, nlb, nub, relu_groups, timeout_lp, timeout_milp, use_default_heuristic, 'deeppoly', K=K, s=s, use_milp=use_milp)
+    #         else:
+    #             handle_softmax_layer(*self.get_arguments(man, element), use_default_heuristic)
+            
+    #         # *** FIX 1: Get bounds from calc_bounds ***
+    #         calc_bounds(man, element, nn, nlb, nub, relu_groups, is_refine_layer=True, use_krelu=refine)
+            
+    #         # *** FIX 2: ENFORCE NORMALIZATION CONSTRAINTS ***
+    #         # Softmax outputs must sum to 1, so we can tighten bounds
+    #         current_nlb = nlb[-1]
+    #         current_nub = nub[-1]
+            
+    #         # If sum of upper bounds > 1.0, normalize them
+    #         sum_ub = sum(current_nub)
+    #         if sum_ub > 1.0:
+    #             # Scale down upper bounds proportionally
+    #             scale_factor = 0.99 / sum_ub  # Use 0.99 to leave small margin
+    #             current_nub = [min(1.0, ub * scale_factor) for ub in current_nub]
+    #             nub[-1] = current_nub
+    #             print(f"DEBUG: Normalized softmax upper bounds, sum was {sum_ub:.6f}")
+            
+    #         # *** FIX 3: ENSURE LOWER BOUNDS ARE NON-NEGATIVE ***
+    #         current_nlb = [max(0.0, lb) for lb in current_nlb]
+    #         nlb[-1] = current_nlb
+            
+    #         # *** FIX 4: TIGHTEN BOUNDS USING SUM CONSTRAINT ***
+    #         # If we know sum must be 1, and we have good bounds on n-1 outputs,
+    #         # we can tighten the bound on the remaining output
+    #         sum_other_ub = sum(current_nub[:-1])
+    #         if sum_other_ub < 1.0:
+    #             # Last output must be at least 1 - sum_other_ub
+    #             current_nlb[-1] = max(current_nlb[-1], 1.0 - sum_other_ub - 1e-6)
+            
+    #         sum_other_lb = sum(current_nlb[:-1])
+    #         if sum_other_lb > 0:
+    #             # Last output must be at most 1 - sum_other_lb
+    #             current_nub[-1] = min(current_nub[-1], 1.0 - sum_other_lb + 1e-6)
+            
+    #         # Update the bounds
+    #         nlb[-1] = current_nlb
+    #         nub[-1] = current_nub
+        
+    #     nn.activation_counter += 1
+    #     if testing:
+    #         return element, nlb[-1], nub[-1]
+    #     return element
+    # def transformer(self, nn, man, element, nlb, nub, relu_groups, refine, timeout_lp, timeout_milp, use_default_heuristic, testing, K=3, s=-2, use_milp=False, approx=True):
+    #     """
+    #     transforms element with handle_softmax_layer
+    #     """
+    #     length = self.output_length
+        
+    #     # Check if this is a concrete evaluation
+    #     pred_layerno = self.predecessors[0] - 1
+        
+    #     is_concrete = True
+    #     concrete_tol = 1e-9
+    #     for i in range(len(nlb[pred_layerno])):
+    #         if abs(nub[pred_layerno][i] - nlb[pred_layerno][i]) > concrete_tol:
+    #             is_concrete = False
+    #             break
+        
+    #     if is_concrete:
+    #         # Concrete evaluation: compute exact softmax
+    #         import numpy as np
+    #         input_vals = np.array([(nlb[pred_layerno][i] + nub[pred_layerno][i]) / 2.0 
+    #                                for i in range(len(nlb[pred_layerno]))])
+            
+    #         # Numerically stable softmax
+    #         max_val = np.max(input_vals)
+    #         exp_vals = np.exp(input_vals - max_val)
+    #         softmax_vals = exp_vals / np.sum(exp_vals)
+            
+    #         # Clamp to [0, 1]
+    #         softmax_vals = np.clip(softmax_vals, 0.0, 1.0)
+            
+    #         print(f"DEBUG: Concrete softmax computed: {softmax_vals}")
+            
+    #         # Store concrete values directly - DO NOT call handle_softmax_layer!
+    #         nlb.append(softmax_vals.tolist())
+    #         nub.append(softmax_vals.tolist())
+            
+    #         # DO NOT call handle_softmax_layer or calc_bounds in concrete case
+    #         # The framework will use nlb/nub directly
+            
+    #     else:
+    #         # Abstract evaluation: use normal abstract transformer
+    #         if refine:
+    #             refine_activation_with_solver_bounds(nn, self, man, element, nlb, nub, relu_groups, timeout_lp, timeout_milp, use_default_heuristic, 'deeppoly', K=K, s=s, use_milp=use_milp)
+    #         else:
+    #             handle_softmax_layer(*self.get_arguments(man, element), use_default_heuristic)
+    #         calc_bounds(man, element, nn, nlb, nub, relu_groups, is_refine_layer=True, use_krelu=refine)
+        
+    #     nn.activation_counter+=1
+    #     if testing:
+    #         return element, nlb[-1], nub[-1]
+    #     return element
+    def transformer(self, nn, man, element, nlb, nub, relu_groups, refine, timeout_lp, timeout_milp, use_default_heuristic, testing, K=3, s=-2, use_milp=False, approx=True):
+        """
+        transforms element with handle_softmax_layer
+        """
+        length = self.output_length
+        
+        # Check if this is a concrete evaluation
+        pred_layerno = self.predecessors[0] - 1
+        
+        is_concrete = True
+        concrete_tol = 1e-9
+        for i in range(len(nlb[pred_layerno])):
+            if abs(nub[pred_layerno][i] - nlb[pred_layerno][i]) > concrete_tol:
+                is_concrete = False
+                break
+        
+        if is_concrete:
+            # Concrete evaluation: compute exact softmax
+            import numpy as np
+            input_vals = np.array([(nlb[pred_layerno][i] + nub[pred_layerno][i]) / 2.0 
+                                   for i in range(len(nlb[pred_layerno]))])
+            
+            # Numerically stable softmax
+            max_val = np.max(input_vals)
+            exp_vals = np.exp(input_vals - max_val)
+            softmax_vals = exp_vals / np.sum(exp_vals)
+            
+            # Ensure values are in valid range [0, 1]
+            softmax_vals = np.clip(softmax_vals, 0.0, 1.0)
+            
+            # Normalize to ensure they sum to exactly 1.0
+            softmax_vals = softmax_vals / np.sum(softmax_vals)
+            
+            # Store concrete values directly
+            nlb.append(softmax_vals.tolist())
+            nub.append(softmax_vals.tolist())
+            
+        else:
+            # Abstract evaluation: use abstract transformer
+            if refine:
+                refine_activation_with_solver_bounds(nn, self, man, element, nlb, nub, relu_groups, timeout_lp, timeout_milp, use_default_heuristic, 'deeppoly', K=K, s=s, use_milp=use_milp)
+            else:
+                handle_softmax_layer(*self.get_arguments(man, element), use_default_heuristic)
+            
+            # Compute bounds
+            calc_bounds(man, element, nn, nlb, nub, relu_groups, is_refine_layer=True, use_krelu=refine)
+            
+            # Post-processing: ensure bounds are valid and tight
+            layerno = len(nlb) - 1
+            sum_lb = sum(nlb[layerno])
+            sum_ub = sum(nub[layerno])
+            
+            # Clamp individual bounds to [0, 1]
+            for i in range(len(nlb[layerno])):
+                nlb[layerno][i] = max(0.0, min(1.0, nlb[layerno][i]))
+                nub[layerno][i] = max(0.0, min(1.0, nub[layerno][i]))
+                # Ensure lb <= ub
+                if nlb[layerno][i] > nub[layerno][i]:
+                    avg = (nlb[layerno][i] + nub[layerno][i]) / 2.0
+                    nlb[layerno][i] = avg
+                    nub[layerno][i] = avg
+            
+            # Tighten bounds based on sum constraint: sum of softmax = 1
+            # If sum of all upper bounds except i is S, then lb[i] >= 1 - S
+            sum_ub = sum(nub[layerno])
+            sum_lb = sum(nlb[layerno])
+            
+            for i in range(len(nlb[layerno])):
+                # Lower bound: at least 1 - (sum of other upper bounds)
+                sum_other_ub = sum_ub - nub[layerno][i]
+                new_lb = max(0.0, 1.0 - sum_other_ub)
+                nlb[layerno][i] = max(nlb[layerno][i], new_lb)
+                
+                # Upper bound: at most 1 - (sum of other lower bounds)
+                sum_other_lb = sum_lb - nlb[layerno][i]
+                new_ub = min(1.0, 1.0 - sum_other_lb)
+                nub[layerno][i] = min(nub[layerno][i], new_ub)
+                
+                # Final check: ensure lb <= ub
+                if nlb[layerno][i] > nub[layerno][i]:
+                    avg = (nlb[layerno][i] + nub[layerno][i]) / 2.0
+                    nlb[layerno][i] = max(0.0, min(1.0, avg))
+                    nub[layerno][i] = max(nlb[layerno][i], min(1.0, avg))
+        
+        nn.activation_counter += 1
+        if testing:
+            return element, nlb[-1], nub[-1]
+        return element
+    

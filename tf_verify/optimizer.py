@@ -29,7 +29,7 @@ import numpy as np
 from read_net_file import *
 
 
-operations_for_neuron_count = ["Relu", "Sigmoid", "Tanh", "MaxPool", "LeakyRelu"]
+operations_for_neuron_count = ["Relu", "Sigmoid", "Tanh", "Softmax", "MaxPool", "LeakyRelu"]
 
 
 class Optimizer:
@@ -235,6 +235,14 @@ class Optimizer:
                 else:
                     execute_list.append(DeeppolyTanhNode(*self.resources[i][domain]))
                 nn.layertypes.append('Tanh')
+                nn.numlayer += 1
+                i += 1
+            elif self.operations[i] == "Softmax":
+                if domain == 'deepzono':
+                    execute_list.append(DeepzonoSoftmax(*self.resources[i][domain]))
+                else:
+                    execute_list.append(DeeppolySoftmaxNode(*self.resources[i][domain]))
+                nn.layertypes.append('Softmax')
                 nn.numlayer += 1
                 i += 1
             elif self.operations[i] == "Gather":

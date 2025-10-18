@@ -440,7 +440,7 @@ class ONNXTranslator:
 		in_out_placeholder = ([], placeholder.name, self.clean_shape(onnxshape_to_intlist(placeholder.type.tensor_type.shape)))
 		operation_resources = [{'deepzono':in_out_placeholder, 'deeppoly':in_out_placeholder}]
 		reshape_map = {}
-		operations_to_be_ignored = ["Pack", "Shape", "StridedSlice", "Prod", "Unsqueeze", "Softmax", "Concat", "Flatten", "BatchNormalization"]
+		operations_to_be_ignored = ["Pack", "Shape", "StridedSlice", "Prod", "Unsqueeze", "Concat", "Flatten", "BatchNormalization"]
 		padding_merger_dict = {}
 
 
@@ -568,7 +568,7 @@ class ONNXTranslator:
 				operation_resources.append({'deepzono':deepzono_res, 'deeppoly':deeppoly_res})
 			elif node.op_type == "Placeholder":
 				assert 0, "Placeholder is not in the ONNX graph"
-			elif node.op_type in ["Relu", "Sigmoid", "Tanh", "LeakyRelu"]:
+			elif node.op_type in ["Relu", "Sigmoid", "Tanh", "Softmax", "LeakyRelu"]:
 				deeppoly_res = self.nonlinearity_resources(node) + in_out_info
 				deepzono_res = deeppoly_res
 				operation_resources.append({'deepzono':deepzono_res, 'deeppoly':deeppoly_res})
