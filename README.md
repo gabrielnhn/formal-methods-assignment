@@ -1,3 +1,10 @@
+
+Also install glpk
+➜ ~ sudo apt-get install libglpk-dev
+➜ ~/formal/assignment/ELINA/fppoly git:(master) sudo apt install liblapacke-dev
+
+
+
 ERAN <img width="100" alt="portfolio_view" align="right" src="http://safeai.ethz.ch/img/sri-logo.svg">
 ========
 
