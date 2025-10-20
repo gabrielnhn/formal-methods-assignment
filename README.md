@@ -5,6 +5,23 @@ Also install glpk
 
 
 
+instructions for compilation
+
+cd elina/fppoly
+make clean
+make
+
+cd .. (elina)
+make
+sudo make install
+
+cd ../tf_verify
+python3 . --netname ../mnist_simplest_softmax.onnx --epsilon 0.001 --domain deeppoly --dataset mnist --num_tests 10
+
+
+
+
+
 ERAN <img width="100" alt="portfolio_view" align="right" src="http://safeai.ethz.ch/img/sri-logo.svg">
 ========
 
