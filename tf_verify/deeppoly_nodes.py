@@ -934,6 +934,7 @@ class DeeppolySoftmaxNode(DeeppolyNonlinearity):
         else:
             # Abstract evaluation: use abstract transformer
             if refine:
+                # not interesting to us
                 refine_activation_with_solver_bounds(nn, self, man, element, nlb, nub, relu_groups, timeout_lp, timeout_milp, use_default_heuristic, 'deeppoly', K=K, s=s, use_milp=use_milp)
             else:
                 handle_softmax_layer(*self.get_arguments(man, element), use_default_heuristic)
