@@ -912,7 +912,7 @@ class DeeppolySoftmaxNode(DeeppolyNonlinearity):
         
         if is_concrete:
             # Concrete evaluation: compute exact softmax
-            import numpy as np
+            # import numpy as np
             input_vals = np.array([(nlb[pred_layerno][i] + nub[pred_layerno][i]) / 2.0 
                                    for i in range(len(nlb[pred_layerno]))])
             
@@ -944,8 +944,40 @@ class DeeppolySoftmaxNode(DeeppolyNonlinearity):
             
             # Post-processing: ensure bounds are valid and tight
             layerno = len(nlb) - 1
-            sum_lb = sum(nlb[layerno])
-            sum_ub = sum(nub[layerno])
+            lb_old = np.array(nlb[layerno])
+            ub_old = np.array(nub[layerno])
+
+            # 1. Clamp to [0, 1]
+            lb = np.clip(lb_old, 0.0, 1.0)
+            ub = np.clip(ub_old, 0.0, 1.0)
+
+            # 2. Enforce lb <= ub consistently
+            mask = lb > ub
+            avg = (lb + ub) / 2.0
+            lb[mask] = avg[mask]
+            ub[mask] = avg[mask]
+
+            # 3. Enforce the normalization constraint ∑y = 1
+            # Use simultaneous tightening (avoid sequential overwriting)
+            sum_ub = np.sum(ub)
+            sum_lb = np.sum(lb)
+            for i in range(len(lb)):
+                sum_other_ub = sum_ub - ub[i]
+                sum_other_lb = sum_lb - lb[i]
+                new_lb = max(0.0, 1.0 - sum_other_ub)
+                new_ub = min(1.0, 1.0 - sum_other_lb)
+                lb[i] = max(lb[i], new_lb)
+                ub[i] = min(ub[i], new_ub)
+
+            # 4. Renormalize small numerical drift
+            total = np.sum((lb + ub) / 2)
+            if abs(total - 1.0) > 1e-6:
+                scale = 1.0 / total
+                lb *= scale
+                ub *= scale
+
+            nlb[layerno] = lb.tolist()
+            nub[layerno] = ub.tolist()
             
             # Clamp individual bounds to [0, 1]
             for i in range(len(nlb[layerno])):
