@@ -3,18 +3,6 @@ import torch.nn as nn
 import torchvision
 import torchvision.transforms as transforms
 
-# Simple MNIST classifier
-# class MNISTNetWithSoftmax(nn.Module):
-#     def __init__(self):
-#         super().__init__()
-#         self.fc1 = nn.Linear(784, 10)
-#         # self.softmax = nn.Softmax(dim=1)
-    
-#     def forward(self, x):
-#         x = x.view(-1, 784)
-#         x = self.fc1(x)
-#         # x = self.softmax(x)
-#         return x
     
 class MNISTNetWithSoftmax(nn.Module):
     def __init__(self):
