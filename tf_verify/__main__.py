@@ -1577,3 +1577,6 @@ else:
 
 
     print('analysis precision ',verified_images,'/ ', correctly_classified_images)
+
+    if domain in ['deeppoly', 'refinepoly']:
+        eran.print_softmax_stats()
