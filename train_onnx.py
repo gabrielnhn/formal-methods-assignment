@@ -4,15 +4,31 @@ import torchvision
 import torchvision.transforms as transforms
 
 # Simple MNIST classifier
+# class MNISTNetWithSoftmax(nn.Module):
+#     def __init__(self):
+#         super().__init__()
+#         self.fc1 = nn.Linear(784, 10)
+#         # self.softmax = nn.Softmax(dim=1)
+    
+#     def forward(self, x):
+#         x = x.view(-1, 784)
+#         x = self.fc1(x)
+#         # x = self.softmax(x)
+#         return x
+    
 class MNISTNetWithSoftmax(nn.Module):
     def __init__(self):
         super().__init__()
-        self.fc1 = nn.Linear(784, 10)
+        self.fc1 = nn.Linear(784, 100)
+        self.fc2 = nn.Linear(100, 50)
+        self.fc3 = nn.Linear(50, 10)
         self.softmax = nn.Softmax(dim=1)
     
     def forward(self, x):
         x = x.view(-1, 784)
-        x = self.fc1(x)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
         x = self.softmax(x)
         return x
 
@@ -61,7 +77,9 @@ print(f'\nTest Accuracy: {accuracy:.2f}%')
 # Export to ONNX
 model.eval()
 dummy_input = torch.randn(1, 784)
-torch.onnx.export(model, dummy_input, "mnist_simplest_softmax.onnx",
+# file = "mnist_simplest_nosoftmax.onnx"
+file = "mnist_simplest_softmax.onnx"
+torch.onnx.export(model, dummy_input, file,
                   input_names=['input'], output_names=['output'],
                   dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
-print("Saved to mnist_simplest_softmax.onnx")
+print(f"Saved to {file}")
