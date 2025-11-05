@@ -1,0 +1,106 @@
+NO SOFTMAX
+
+eps=0.0
+progress: 100/None, correct:  98/100, verified: 98/98, unsafe: 0/98,  time: 0.071; 0.058; 5.717
+analysis precision  98 /  98
+
+eps=0.005
+progress: 100/None, correct:  98/100, verified: 96/98, unsafe: 0/98,  time: 0.079; 0.063; 6.126
+analysis precision  96 /  98
+
+eps=0.010
+progress: 100/None, correct:  98/100, verified: 94/98, unsafe: 0/98,  time: 0.078; 0.063; 6.173
+analysis precision  94 /  98
+
+eps=0.015
+progress: 100/None, correct:  98/100, verified: 94/98, unsafe: 0/98,  time: 0.080; 0.064; 6.224
+analysis precision  94 /  98
+
+eps=0.020
+progress: 100/None, correct:  98/100, verified: 87/98, unsafe: 0/98,  time: 0.075; 0.065; 6.388
+analysis precision  87 /  98
+
+eps=0.025
+progress: 100/None, correct:  98/100, verified: 77/98, unsafe: 0/98,  time: 0.084; 0.067; 6.564
+analysis precision  77 /  98
+
+eps=0.030
+progress: 100/None, correct:  98/100, verified: 61/98, unsafe: 0/98,  time: 0.077; 0.071; 6.989
+analysis precision  61 /  98
+
+
+WITH SOFTMAX
+
+eps=0.0
+progress: 100/None, correct:  98/100, verified: 98/98, unsafe: 0/98,  time: 0.078; 0.060; 5.907
+analysis precision  98 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   0
+LSE LP Success (Tier 1):   0
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 0
+
+
+eps=0.005
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.765; 0.689; 67.515
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1960
+LSE LP Success (Tier 1):   1960
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 200
+
+
+eps=0.010
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.749; 0.689; 67.541
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1960
+LSE LP Success (Tier 1):   1960
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 210
+
+eps=0.015
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.787; 0.693; 67.912
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1960
+LSE LP Success (Tier 1):   1960
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 218
+-----------------------------------
+
+eps=0.020
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.764; 0.694; 68.042
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1960
+LSE LP Success (Tier 1):   1960
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 222
+
+
+eps=0.025
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.731; 0.701; 68.728
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1960
+LSE LP Success (Tier 1):   1940
+LSE SVD Fallback (Tier 2):   20
+Failure case Fallback: 222
+
+eps=0.030
+progress: 100/None, correct:  98/100, verified: 0/98, unsafe: 0/98,  time: 0.722; 0.382; 68.433
+analysis precision  0 /  98
+
+--- Softmax Approximation Stats ---
+TOTAL CALLS:   1940
+LSE LP Success (Tier 1):   1940
+LSE SVD Fallback (Tier 2):   0
+Failure case Fallback: 226

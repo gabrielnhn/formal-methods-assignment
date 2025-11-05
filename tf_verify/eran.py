@@ -142,3 +142,6 @@ class ERAN:
         dominant_class, nlb, nub, failed_labels, x = analyzer.analyze()
         return dominant_class, nn, nlb, nub, failed_labels, x
 
+
+    def print_softmax_stats(self):
+        print_softmax_approximation_stats(None)

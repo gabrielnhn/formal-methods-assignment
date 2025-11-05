@@ -1568,12 +1568,15 @@ else:
             print("img",i,"not considered, incorrectly classified")
             end = time.time()
 
-        print(f"progress: {1 + i - config.from_test}/{config.num_tests}, "
-              f"correct:  {correctly_classified_images}/{1 + i - config.from_test}, "
-              f"verified: {verified_images}/{correctly_classified_images}, "
-              f"unsafe: {unsafe_images}/{correctly_classified_images}, ",
-              f"time: {end - start:.3f}; {0 if cum_time==0 else cum_time / correctly_classified_images:.3f}; {cum_time:.3f}")
+    print(f"progress: {1 + i - config.from_test}/{config.num_tests}, "
+            f"correct:  {correctly_classified_images}/{1 + i - config.from_test}, "
+            f"verified: {verified_images}/{correctly_classified_images}, "
+            f"unsafe: {unsafe_images}/{correctly_classified_images}, ",
+            f"time: {end - start:.3f}; {0 if cum_time==0 else cum_time / correctly_classified_images:.3f}; {cum_time:.3f}")
 
 
 
     print('analysis precision ',verified_images,'/ ', correctly_classified_images)
+
+    if domain in ['deeppoly', 'refinepoly']:
+        eran.print_softmax_stats()
